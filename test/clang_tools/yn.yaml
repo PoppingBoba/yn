@@ -8,3 +8,4 @@ app:
   cflags: '-O2 -W -Wall'
   source:
     - main.c
+    - test.c
