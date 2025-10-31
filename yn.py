@@ -3,6 +3,7 @@
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #                       YAML to Ninja Generator Demo
 #         Author : Henry Shin <henry.shin@thundersoft.com>
+#                  Nakada Tokumei <nakada_tokumei@protonmail.com>
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 import yaml
@@ -16,14 +17,35 @@ class YamlParser:
         self.out = ''
         self.source = ''
         self.cflags = ''
+
+        # Tools
+        self.cc = 'gcc'
+        self.cxx = 'g++'
+        self.linker = 'gcc'
         pass
+
+    def load_tools(self, obj):
+        if 'cc' in obj:
+            self.cc = obj['cc']
+        if 'cxx' in obj:
+            self.cxx = obj['cxx']
+        if 'linker' in obj:
+            self.linker = obj['linker']
+        
+    def load_app(self, obj):
+        self.out = obj['out']
+        self.source = obj['source']
+        self.cflags = obj['cflags']
 
     def load(self):
         # print(yaml.load(self.stream, self.loader))
-        yaml_obj = yaml.load(self.stream, self.loader)['app']
-        self.out = yaml_obj['out']
-        self.source = yaml_obj['source']
-        self.cflags = yaml_obj['cflags']
+        yaml_obj = yaml.load(self.stream, self.loader)
+        print(yaml_obj)
+        if 'tools' in yaml_obj:
+            self.load_tools(yaml_obj['tools'])
+            pass
+
+        self.load_app(yaml_obj['app'])
 
 class NinjaRuleBase:
     def __init__(self):
@@ -83,6 +105,7 @@ class NinjaBuildApp():
             print(f"build {source}.o: {rules_list[source_format]} {source}", file=stream)
             if self.cflags != None:
                 print(f"    cflags = {self.cflags}", file=stream)
+            print(f"", file=stream)
             pass
         pass
 
@@ -109,9 +132,9 @@ def yn_main(args):
 
     ninja_out = open(args.b + '/build.ninja', 'w')
     rules = [
-        NinjaCCRule(),
-        NinjaCXXRule(),
-        NinjaLDRule()
+        NinjaCCRule(parser.cc),
+        NinjaCXXRule(parser.cxx),
+        NinjaLDRule(parser.linker)
     ]
 
     for rule in rules:
@@ -120,7 +143,6 @@ def yn_main(args):
     build_app = NinjaBuildApp(parser)
     build_app.write_obj_build_rules(ninja_out)
     build_app.write_build_apps(ninja_out)
-
 
 argparser = argparse.ArgumentParser()
 argparser.add_argument('-b', help=' : Set Build Path', default='./')
