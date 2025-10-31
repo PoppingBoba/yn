@@ -6,6 +6,8 @@
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 import yaml
+import argparse
+import os
 
 class YamlParser:
     def __init__(self, file_name: str, loader = yaml.Loader):
@@ -17,6 +19,7 @@ class YamlParser:
         pass
 
     def load(self):
+        # print(yaml.load(self.stream, self.loader))
         yaml_obj = yaml.load(self.stream, self.loader)['app']
         self.out = yaml_obj['out']
         self.source = yaml_obj['source']
@@ -37,33 +40,34 @@ class NinjaRuleBase:
         pass
 
 class NinjaCCRule(NinjaRuleBase):
-    def __init__(self):
+    def __init__(self, tools='gcc'):
         super().__init__()
         self.rulename = 'cc'
         self.description = 'CC $out'
-        self.command = 'gcc -c $in -o $out $cflags $includes'
+        self.command = tools + ' -c $in -o $out $cflags $includes'
         pass
 
 class NinjaCXXRule(NinjaRuleBase):
-    def __init__(self):
+    def __init__(self, tools='g++'):
         super().__init__()
         self.rulename = 'cxx'
         self.description = 'CXX $out'
-        self.command = 'g++ -c $in -o $out $cflags $includes'
+        self.command = tools + ' -c $in -o $out $cflags $includes'
         pass
 
 class NinjaLDRule(NinjaRuleBase):
-    def __init__(self):
+    def __init__(self, tools='gcc'):
         super().__init__()
         self.rulename = 'linker'
         self.description = 'LINK $out'
-        self.command = 'gcc $in -o $out $ldflags'
+        self.command = tools + ' $in -o $out $ldflags'
         pass
 
 class NinjaBuildApp():
     def __init__(self, yaml_parser : YamlParser):
         self.out = yaml_parser.out
         self.sources = yaml_parser.source
+        self.cflags = yaml_parser.cflags
         self.objs = []
         pass
 
@@ -77,6 +81,8 @@ class NinjaBuildApp():
             source_format = source.split(".")[-1]
             self.objs.append(source + '.o')
             print(f"build {source}.o: {rules_list[source_format]} {source}", file=stream)
+            if self.cflags != None:
+                print(f"    cflags = {self.cflags}", file=stream)
             pass
         pass
 
@@ -85,24 +91,43 @@ class NinjaBuildApp():
         print(f"default {self.out}", file=stream)
         pass
 
-parser = YamlParser('test/helloworld/yn.yaml')
-parser.load()
-print("out: " + str(parser.out))
-print("source: " + str(parser.source))
-print("cflags: " + str(parser.cflags))
+def yn_main(args):
+    if args.b[-1] != '/':
+        args.b += '/'
+    yaml_file_path = args.b + args.f
+    
+    if not os.path.exists(yaml_file_path):
+        print(f'{yaml_file_path} is not exist...')
+        return     
+    
+    parser = YamlParser(yaml_file_path)
+    parser.load()
 
-ninja_out = open('test/helloworld/build.ninja', 'w')
-rules = [
-    NinjaCCRule(),
-    NinjaCXXRule(),
-    NinjaLDRule()
-]
+    print("out: " + str(parser.out))
+    print("source: " + str(parser.source))
+    print("cflags: " + str(parser.cflags))
 
-for rule in rules:
-    rule.pack(ninja_out)
+    ninja_out = open(args.b + '/build.ninja', 'w')
+    rules = [
+        NinjaCCRule(),
+        NinjaCXXRule(),
+        NinjaLDRule()
+    ]
 
-build_app = NinjaBuildApp(parser)
-build_app.write_obj_build_rules(ninja_out)
-build_app.write_build_apps(ninja_out)
+    for rule in rules:
+        rule.pack(ninja_out)
 
+    build_app = NinjaBuildApp(parser)
+    build_app.write_obj_build_rules(ninja_out)
+    build_app.write_build_apps(ninja_out)
+
+
+argparser = argparse.ArgumentParser()
+argparser.add_argument('-b', help=' : Set Build Path', default='./')
+argparser.add_argument('-f', help=' : Set yn file', default='yn.yaml')
+args = argparser.parse_args()
+
+if __name__ == '__main__':
+    yn_main(args=args)
+    pass
 
