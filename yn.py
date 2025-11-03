@@ -85,6 +85,14 @@ class NinjaLDRule(NinjaRuleBase):
         self.command = tools + ' $in -o $out $ldflags'
         pass
 
+class NinjaCleanRule(NinjaRuleBase):
+    def __init__(self):
+        super().__init__()
+        self.rulename = 'clean'
+        self.description = 'CLEAN $in'
+        self.command = 'rm -rf $in'
+        pass
+
 class NinjaBuildApp():
     def __init__(self, yaml_parser : YamlParser):
         self.out = yaml_parser.out
@@ -111,6 +119,7 @@ class NinjaBuildApp():
 
     def write_build_apps(self, stream):
         print(f"build {self.out}: linker {' '.join(self.objs)}", file=stream)
+        print(f"build clean : clean {self.out} {' '.join(self.objs)}", file=stream)
         print(f"default {self.out}", file=stream)
         pass
 
@@ -134,7 +143,8 @@ def yn_main(args):
     rules = [
         NinjaCCRule(parser.cc),
         NinjaCXXRule(parser.cxx),
-        NinjaLDRule(parser.linker)
+        NinjaLDRule(parser.linker),
+        NinjaCleanRule(),
     ]
 
     for rule in rules:
