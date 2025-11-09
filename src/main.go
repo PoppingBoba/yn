@@ -3,7 +3,16 @@ package main
 import (
 	"fmt"
 	"os"
+
+	"github.com/PoppingBoba/ninjago"
 )
+
+func test_ninjago() {
+	var cxx_rule = ninjago.MakeNinjaGoRule("cxx", "g++ -c $in -o $out $cflags $includes", "CXX $out")
+
+	fmt.Println("========== Check CXX Rule ==========")
+	fmt.Println(cxx_rule.String())
+}
 
 func main() {
 	fmt.Print("Hello yn\n")
@@ -17,4 +26,6 @@ func main() {
 
 	fmt.Println("Check Argument Test [-b] : ", arg_parser.Get("-b").value)
 	fmt.Println("Check Argument Test [-f] : ", arg_parser.Get("-f").value)
+
+	test_ninjago()
 }

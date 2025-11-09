@@ -10,7 +10,7 @@ type ArgsParser struct {
 }
 
 type ArgsParserInterface interface {
-	AddArgument(string, string)
+	AddArgument(string, string, string)
 	Parse([]string)
 	Get(string) string
 	isExist(string) bool
