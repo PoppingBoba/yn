@@ -1,0 +1,9 @@
+go 1.25.4
+
+use (
+    .
+)
+
+replace (
+    github.com/PoppingBoba/ninjago => ../ninjago
+)

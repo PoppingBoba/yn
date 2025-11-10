@@ -2,3 +2,5 @@ github.com/PoppingBoba/ninjago v0.0.0-20251109112019-9a9445562a76 h1:y6+Eyq4khOY
 github.com/PoppingBoba/ninjago v0.0.0-20251109112019-9a9445562a76/go.mod h1:Lphjy08vecTS9oE8KN12rmn8hTkA+E7aTFNUqlVfSfI=
 github.com/PoppingBoba/ninjago v0.0.0-20251109113507-af6e7d1a338f h1:gDfi0XcBAmpAGJEdUa0F5LfKiTn88GeXm0Jb7tfOWI8=
 github.com/PoppingBoba/ninjago v0.0.0-20251109113507-af6e7d1a338f/go.mod h1:Lphjy08vecTS9oE8KN12rmn8hTkA+E7aTFNUqlVfSfI=
+github.com/goccy/go-yaml v1.18.0 h1:8W7wMFS12Pcas7KU+VVkaiCng+kG8QiFeFwzFb+rwuw=
+github.com/goccy/go-yaml v1.18.0/go.mod h1:XBurs7gK8ATbW4ZPGKgcbrY1Br56PdM69F7LkFRi1kA=

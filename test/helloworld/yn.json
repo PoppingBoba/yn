@@ -1,0 +1,8 @@
+{
+    "app" : {
+        "out" : "helloworld",
+        "source" : [
+            "main.c"
+        ]
+    }
+}
